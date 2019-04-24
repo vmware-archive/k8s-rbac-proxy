@@ -1,0 +1,130 @@
+### with knative + proxy + flushing opaque
+
+```
+root@rbac-proxy-tester:/tmp/build/ary23/src/github.com/cppforlife/kube-rbac-proxy# GOCACHE=off CGO_ENABLED=0 time go test ./test/e2e/ -timeout 120m -test.v
+=== RUN   TestMergedListResp
+config map creation (all ns) took 80.891927ms
+config map listing (empty ns) took 261.905569ms
+--- PASS: TestMergedListResp (0.61s)
+=== RUN   TestOpaqueResp
+config map listing (per ns) took 79.973098ms
+config map listing (per ns) took 80.547012ms
+config map listing (per ns) took 59.471216ms
+config map listing (per ns) took 60.559043ms
+--- PASS: TestOpaqueResp (0.65s)
+PASS
+```
+
+### without knative + proxy + flushing opaque
+
+```
+root@rbac-proxy-tester:/tmp/build/ary23/src/github.com/cppforlife/kube-rbac-proxy# KUBERNETES_SERVICE_PORT=444 GOCACHE=off CGO_ENABLED=0 time go test ./test/e2e/ -timeout 120m -test.v
+=== RUN   TestMergedListResp
+config map creation (all ns) took 18.402873ms
+config map listing (empty ns) took 62.913818ms
+--- PASS: TestMergedListResp (0.16s)
+=== RUN   TestOpaqueResp
+config map listing (per ns) took 5.92695ms
+config map listing (per ns) took 4.459745ms
+config map listing (per ns) took 3.983117ms
+config map listing (per ns) took 3.838351ms
+--- PASS: TestOpaqueResp (0.05s)
+PASS
+```
+
+### with knative + proxy + NO flushing opaque
+
+```
+=== RUN   TestMergedListResp
+config map creation (all ns) took 12.303887ms
+config map listing (empty ns) took 61.035393ms
+--- PASS: TestMergedListResp (0.13s)
+=== RUN   TestOpaqueResp
+config map listing (per ns) took 4.934201ms
+config map listing (per ns) took 4.645274ms
+config map listing (per ns) took 5.635919ms
+config map listing (per ns) took 7.587513ms
+--- PASS: TestOpaqueResp (0.05s)
+```
+
+### with knative + proxy + NO flushing opaque on lists
+
+```
+=== RUN   TestMergedListResp
+config map creation (all ns) took 15.429086ms
+config map listing (empty ns) took 38.067606ms
+--- PASS: TestMergedListResp (0.11s)
+=== RUN   TestOpaqueResp
+config map listing (per ns) took 5.034331ms
+config map listing (per ns) took 3.977903ms
+config map listing (per ns) took 4.021856ms
+config map listing (per ns) took 3.955457ms
+--- PASS: TestOpaqueResp (0.04s)
+PASS
+```
+
+### direct kube + cluster wide list (141 items)
+
+```
+=== RUN   TestMergedListResp
+config map creation (all ns) took 13.071279ms
+config map listing (empty ns) took 25.753227ms
+--- PASS: TestMergedListResp (0.08s)
+=== RUN   TestOpaqueResp
+config map listing (per ns) took 4.991978ms
+config map listing (per ns) took 3.908227ms
+config map listing (per ns) took 3.770028ms
+config map listing (per ns) took 3.901901ms
+--- PASS: TestOpaqueResp (0.05s)
+PASS
+```
+
+### with knative (beginning) + proxy + NO flushing opaque on lists + 3 ns
+
+```
+=== RUN   TestMergedListResp
+config map creation (all ns) took 23.848029ms
+config map listing (empty ns) took 42.310002ms
+--- PASS: TestMergedListResp (0.16s)
+=== RUN   TestOpaqueResp
+config map listing (per ns) took 5.009363ms
+config map listing (per ns) took 5.78358ms
+config map listing (per ns) took 5.166226ms
+config map listing (per ns) took 3.963128ms
+config map listing (per ns) took 4.130683ms
+config map listing (per ns) took 3.41275ms
+--- PASS: TestOpaqueResp (0.08s)
+PASS
+```
+
+```
+=== RUN   TestMergedListResp
+config map creation (all ns) took 17.069995ms
+config map listing (empty ns) took 36.227455ms
+--- PASS: TestMergedListResp (0.12s)
+=== RUN   TestOpaqueResp
+config map listing (per ns) took 6.424361ms
+config map listing (per ns) took 6.662299ms
+config map listing (per ns) took 5.774331ms
+config map listing (per ns) took 5.71695ms
+config map listing (per ns) took 6.492533ms
+config map listing (per ns) took 5.454609ms
+--- PASS: TestOpaqueResp (0.08s)
+PASS
+```
+
+### direct kube
+
+```
+=== RUN   TestMergedListResp
+config map creation (all ns) took 11.240738ms
+--- FAIL: TestMergedListResp (0.08s)
+    merged_list_resp_test.go:35: configmaps is forbidden: User "system:serviceaccount:default:rbac-proxy-tester" cannot list configmaps at the cluster scope
+=== RUN   TestOpaqueResp
+config map listing (per ns) took 3.559499ms
+config map listing (per ns) took 3.543336ms
+config map listing (per ns) took 3.883317ms
+config map listing (per ns) took 2.915745ms
+--- PASS: TestOpaqueResp (0.04s)
+FAIL
+```

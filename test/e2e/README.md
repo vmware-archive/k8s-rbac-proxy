@@ -1,0 +1,9 @@
+- opaque response
+  - GET, PUT
+- list responses
+  - 0 namespaces
+  - X namespaces
+- watch responses
+  - 0 namespaces
+  - X namespaces
+- perf test for X number of configmaps over N namespaces

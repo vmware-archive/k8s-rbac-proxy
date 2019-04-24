@@ -1,0 +1,31 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: rbac-proxy-deployer
+rules:
+- apiGroups:
+  - "*"
+  resources:
+  - "*"
+  verbs:
+  - "*"
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: rbac-proxy-deployer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rbac-proxy-deployer
+subjects:
+- kind: ServiceAccount
+  name: rbac-proxy-deployer
+  namespace: default
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rbac-proxy-deployer
+  namespace: default

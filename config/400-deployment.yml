@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rbac-proxy
+  namespace: rbac-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      kube-rbac-proxy.cppforlife.com/proxy: ""
+  template:
+    metadata:
+      labels:
+        kube-rbac-proxy.cppforlife.com/proxy: ""
+    spec:
+      serviceAccount: rbac-proxy
+      containers:
+      - name: build-controller
+        args:
+        - -listenAddr=:443
+        - -tlsCertPath=/etc/rbac-proxy-tls/tls.crt
+        - -tlsKeyPath=/etc/rbac-proxy-tls/tls.key
+        # - -debug
+        image: index.docker.io/dkalinin/proxy-5f08262147ba08c87213aebf05ea8827@sha256:8638c2107d585303d089d63dfb51a6d6a00a00967de96de6c75f6be96060cfc8
+        volumeMounts:
+        - mountPath: /etc/rbac-proxy-tls
+          name: rbac-proxy-tls
+      volumes:
+      - name: rbac-proxy-tls
+        secret:
+          secretName: rbac-proxy-tls

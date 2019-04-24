@@ -1,0 +1,51 @@
+### Proxy + 3 ns * 100 configmap
+
+```
+=== RUN   TestMergedListRespPerf
+config map creation (all ns) took 1.319823827s
+got 300 config maps
+config map listing (empty ns) took 53.752756ms
+--- PASS: TestMergedListRespPerf (2.93s)
+PASS
+```
+
+### Proxy + 3 ns * 1000 configmap
+
+```
+=== RUN   TestMergedListRespPerf
+config map creation (all ns) took 12.757565231s
+got 3000 config maps
+config map listing (empty ns) took 114.402948ms
+--- PASS: TestMergedListRespPerf (14.61s)
+PASS
+```
+
+### Proxy + 3 ns * 10000 configmap
+
+```
+=== RUN   TestMergedListRespPerf
+got 30000 config maps
+config map listing (empty ns) took 772.212211ms
+--- PASS: TestMergedListRespPerf (0.77s)
+PASS
+```
+
+### Direct API + cluster level access
+
+```
+=== RUN   TestMergedListRespPerf
+got 30144 config maps
+config map listing (empty ns) took 869.020072ms
+--- PASS: TestMergedListRespPerf (0.87s)
+PASS
+```
+
+### Proxy + cluster level access
+
+```
+=== RUN   TestMergedListRespPerf
+got 30144 config maps
+config map listing (empty ns) took 983.727184ms
+--- PASS: TestMergedListRespPerf (0.99s)
+PASS
+```

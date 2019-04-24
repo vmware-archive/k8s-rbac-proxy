@@ -1,0 +1,122 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: etcd-operator1
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: etcd-operator-sa
+  namespace: etcd-operator1
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: etcd-operator-role
+rules:
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - "*"
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: etcd-operator-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: etcd-operator-role
+subjects:
+- kind: ServiceAccount
+  name: etcd-operator-sa
+  namespace: etcd-operator1
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: etcd-operator-binding
+  namespace: etcd-operator1
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: etcd-operator-role
+subjects:
+- kind: ServiceAccount
+  name: etcd-operator-sa
+  namespace: etcd-operator1
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  name: etcd-operator-role
+  namespace: etcd-operator1
+rules:
+- apiGroups:
+  - etcd.database.coreos.com
+  resources:
+  - etcdclusters
+  - etcdbackups
+  - etcdrestores
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - services
+  - endpoints
+  - persistentvolumeclaims
+  - events
+  verbs:
+  - "*"
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - "*"
+# The following permissions can be removed if not using S3 backup and TLS
+- apiGroups:
+  - ""
+  resources: 
+  - secrets
+  verbs:
+  - get
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etcd-operator
+  namespace: etcd-operator1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: etcd-operator
+  template:
+    metadata:
+      labels:
+        name: etcd-operator
+    spec:
+      serviceAccount: etcd-operator-sa
+      containers:
+      - name: etcd-operator
+        image: quay.io/coreos/etcd-operator:v0.9.3
+        command:
+        - etcd-operator
+        - -cluster-wide # will use rbac proxy
+        env:
+        - name: KUBERNETES_SERVICE_HOST
+          value: proxy.rbac-test.svc.cluster.local
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
